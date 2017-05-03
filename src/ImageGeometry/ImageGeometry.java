@@ -20,7 +20,7 @@ public class ImageGeometry {
         this.window=window;
     }
 
-    public double deviationX() {
+    private double deviationX() {
         List<Double> sdX = new ArrayList<Double>();
         double mid = getMeanX();
         for (int i = 0; i < valX.size(); i++) {
@@ -35,7 +35,7 @@ public class ImageGeometry {
 
     }
 
-    public double deviationY() {
+    private double deviationY() {
         List<Double> sdY = new ArrayList<Double>();
         double mid = getMeanY();
         for (int i = 0; i < valY.size(); i++) {
@@ -50,7 +50,7 @@ public class ImageGeometry {
 
     }
 
-    public double getMeanX() {
+   private double getMeanX() {
         int sum = 0;
         if (valX == null) {
             calculateMeanValue();
@@ -59,27 +59,29 @@ public class ImageGeometry {
         for (int i = 0; i < valX.size(); i++) {
             sum += valX.get(i);
         }
-
-
-
-
-        return sum / valX.size();
+       return sum / valX.size();
     }
 
-    public double getMeanY() {
+    private double getMeanY() {
         int sum = 0;
         if (valY == null) {
             calculateMeanValue();
-
         }
         for (int i = 0; i < valY.size(); i++) {
             sum += valY.get(i);
         }
-
         return sum / valY.size();
     }
 
-
+    public ImageData getImageDate(String imageName)
+    {
+        ImageData imageData=new ImageData(imageName);
+        imageData.deviationX= (int) deviationX();
+        imageData.deviationY= (int) deviationY();
+        imageData.MeanX= (int) getMeanX();
+        imageData.MeanY= (int) getMeanY();
+        return imageData;
+    }
     public void calculateMeanValue() {
         int w = image.getWidth();
         int h = image.getHeight();
@@ -102,6 +104,4 @@ public class ImageGeometry {
 
         }
     }
-
-
 }
