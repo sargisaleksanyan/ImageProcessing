@@ -3,7 +3,9 @@ package Tools;
 import javax.swing.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -16,7 +18,7 @@ public class FilterTool extends JPanel {
     private JCheckBox ch2 = new JCheckBox(" - Filter 2");
     private JCheckBox ch3 = new JCheckBox(" - Filter 3");
     private JCheckBox ch4 = new JCheckBox(" - Filter 4");
-
+    private List<HashMap<int[],Boolean>> filters;
 
 
     private JButton resetFilter;
@@ -28,23 +30,32 @@ public class FilterTool extends JPanel {
     public void setSelectedFilters(List<String> selectedFilters) {
         this.selectedFilters = selectedFilters;
     }
-
+    private List<Filter> filterList;
     private List<String> selectedFilters;
     private boolean isCheckedCh0 = false, isCheckedCh1 = false, isCheckedCh2 = false, isCheckedCh3 = false, isCheckedCh4 = false;
-    private final String first= "first", second = "second", third = "third", forth = "forth", five = "five";
+    public final static String first= "first", second = "second", third = "third", forth = "forth", five = "five";
     private String current=null;
-    public FilterTool()
+    private BufferedImage bufferedImage;
+    public FilterTool(BufferedImage bufferedImage)
     {
-
         createAndShowGUI();
-
         event e = new event();
+        this.bufferedImage=bufferedImage;
       //  ch0.addItemListener(e);
         ch1.addItemListener(e);
         ch2.addItemListener(e);
         ch3.addItemListener(e);
         ch4.addItemListener(e);
 
+    }
+    public Filter[] getFilters()
+    {
+        Filter filter[]=new Filter[4];
+        filter[0]=new Filter(bufferedImage,first);
+        filter[1]=new Filter(bufferedImage,second);
+        filter[2]=new Filter(bufferedImage,third);
+        filter[3]=new Filter(bufferedImage,forth);
+        return filter;
     }
     public JButton getResetFilter() {
         return resetFilter;
@@ -55,7 +66,6 @@ public class FilterTool extends JPanel {
     }
     public void unSelectCheckBox()
     {
-      //  ch0.setSelected(false);
         ch1.setSelected(false);
         ch2.setSelected(false);
         ch3.setSelected(false);
@@ -69,19 +79,6 @@ public class FilterTool extends JPanel {
             {
                 selectedFilters=new ArrayList<>();
             }
-
-         /*   if (ch0.isSelected()) {
-                isCheckedCh0 = true;
-                selectedFilters.add(first);
-
-            } else {
-                isCheckedCh0 = false;
-                if(selectedFilters.contains(first))
-                {
-                    selectedFilters.remove(first);
-                }
-
-            }*/
             if (ch1.isSelected()) {
                 isCheckedCh1 = true;
                 selectedFilters.add(second);

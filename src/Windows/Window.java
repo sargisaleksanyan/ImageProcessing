@@ -132,7 +132,7 @@ public class Window extends JFrame implements ActionListener {
         }
         reset= new JButton("Reset");
         reset.setPreferredSize(new Dimension(200,20));
-        filterFrame=new FilterTool();
+        filterFrame=new FilterTool(currentImage);
         add(filterFrame);
         filterFrame.getResetFilter().addActionListener(this);
         invalidate();
