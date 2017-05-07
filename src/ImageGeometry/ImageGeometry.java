@@ -94,7 +94,7 @@ public class ImageGeometry {
                 int R = c.getRed();
                 int G = c.getGreen();
                 int B = c.getBlue();
-                if (window.getFilterTool().calcFilter(R, B, G)) {
+                if (window.getFilterTool().isFaceLayer(R, B, G)) {
                     valX.add(j);
                     valY.add(i);
                 } else {

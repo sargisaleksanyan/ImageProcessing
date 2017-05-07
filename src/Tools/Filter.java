@@ -17,7 +17,7 @@ public class Filter {
         this.bufferedImage=bufferedImage;
         imagePixel=getImagePoints();
     }
-    private boolean isFaceLayerByFilter(int R,int B,int G)
+   public boolean isFaceLayerByFilter(int R,int B,int G)
     {
         double filters[]=bounds(G);
         double S_1=filters[0];

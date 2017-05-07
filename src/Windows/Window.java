@@ -124,7 +124,7 @@ public class Window extends JFrame implements ActionListener {
             buttonPanel.add(filter_byframe);
             buttonPanel.add(saveFrame);
     }
-    public void setFilterTool()
+    public void setFilterTool(BufferedImage bufferedImage)
     {
         if(filterFrame!=null)
         {
@@ -132,7 +132,7 @@ public class Window extends JFrame implements ActionListener {
         }
         reset= new JButton("Reset");
         reset.setPreferredSize(new Dimension(200,20));
-        filterFrame=new FilterTool(currentImage);
+        filterFrame=new FilterTool(bufferedImage);
         add(filterFrame);
         filterFrame.getResetFilter().addActionListener(this);
         invalidate();
@@ -148,9 +148,10 @@ public class Window extends JFrame implements ActionListener {
             imageSourceName = chooser.getSelectedFile().toString();
             imageLabel.setIcon(image);
             initButtonsForImage();
-            setFilterTool();
+
             imagePoint=imageLabel.getLocation();
             myImage = readImage(imageSourceName);
+            setFilterTool(myImage);
             invalidate();
         } else {
             System.out.println("No Selection ");
@@ -365,7 +366,7 @@ public class Window extends JFrame implements ActionListener {
         {
             ImageData id= getImage_Data();
             filterFrameImage(id);
-            int a=5;
+         
         }
 
     }

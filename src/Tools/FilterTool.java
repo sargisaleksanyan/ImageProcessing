@@ -4,34 +4,30 @@ import javax.swing.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by sargis on 4/28/17.
  */
 public class FilterTool extends JPanel {
     private JToolBar t1;
- //   private JCheckBox ch0 = new JCheckBox(" - NOT");
     private JCheckBox ch1 = new JCheckBox(" - Filter 1");
     private JCheckBox ch2 = new JCheckBox(" - Filter 2");
     private JCheckBox ch3 = new JCheckBox(" - Filter 3");
     private JCheckBox ch4 = new JCheckBox(" - Filter 4");
     private List<HashMap<int[],Boolean>> filters;
-
-
     private JButton resetFilter;
-
-    public List<String> getSelectedFilters() {
+    public HashMap<String,Filter> getSelectedFilters() {
         return selectedFilters;
     }
-
-    public void setSelectedFilters(List<String> selectedFilters) {
+    public void setSelectedFilters(HashMap<String,Filter> selectedFilters) {
         this.selectedFilters = selectedFilters;
     }
-    private List<Filter> filterList;
-    private List<String> selectedFilters;
+    private Filter[] filterList;
+    private HashMap<String,Filter> selectedFilters;
     private boolean isCheckedCh0 = false, isCheckedCh1 = false, isCheckedCh2 = false, isCheckedCh3 = false, isCheckedCh4 = false;
     public final static String first= "first", second = "second", third = "third", forth = "forth", five = "five";
     private String current=null;
@@ -40,13 +36,13 @@ public class FilterTool extends JPanel {
     {
         createAndShowGUI();
         event e = new event();
+
         this.bufferedImage=bufferedImage;
-      //  ch0.addItemListener(e);
+        filterList=getFilters();
         ch1.addItemListener(e);
         ch2.addItemListener(e);
         ch3.addItemListener(e);
         ch4.addItemListener(e);
-
     }
     public Filter[] getFilters()
     {
@@ -60,7 +56,6 @@ public class FilterTool extends JPanel {
     public JButton getResetFilter() {
         return resetFilter;
     }
-
     public void setResetFilter(JButton resetFilter) {
         this.resetFilter = resetFilter;
     }
@@ -77,145 +72,80 @@ public class FilterTool extends JPanel {
         public void itemStateChanged(ItemEvent e){
             if(selectedFilters==null)
             {
-                selectedFilters=new ArrayList<>();
+                selectedFilters=new HashMap<>();
             }
             if (ch1.isSelected()) {
                 isCheckedCh1 = true;
-                selectedFilters.add(second);
+                selectedFilters.put(second,filterList[0]);
 
             } else {
                 isCheckedCh1 = false;
-                if(selectedFilters.contains(second))
+                if(selectedFilters.containsKey(second) )
                 {
                     selectedFilters.remove(second);
                 }
             }
             if (ch2.isSelected()) {
                 isCheckedCh2 = true;
-                selectedFilters.add(third);
+                selectedFilters.put(third,filterList[1]);
             } else {
                 isCheckedCh2 = false;
-                if(selectedFilters.contains(third))
+                if(selectedFilters.containsKey(third))
                 {
                     selectedFilters.remove(third);
                 }
             }
             if (ch3.isSelected()) {
-                selectedFilters.add(forth);
+                selectedFilters.put(forth,filterList[2]);
                 isCheckedCh3 = true;
 
             } else {
                 isCheckedCh3 = false;
-                if(selectedFilters.contains(forth))
+                if(selectedFilters.containsKey(forth))
                 {
                     selectedFilters.remove(forth);
                 }
             }
             if (ch4.isSelected()) {
                 isCheckedCh4 = true;
-                selectedFilters.add(five);;
+                selectedFilters.put(five,filterList[3]);;
             } else {
                 isCheckedCh4 = false;
-                if(selectedFilters.contains(five))
+                if(selectedFilters.containsKey(five))
                 {
                     selectedFilters.remove(five);
                 }
             }
         }
     }
-    public boolean calcFilter(int R, int B, int G) {
-        int S0 = 0, S4 = 0;
-        if (isCheckedCh1 && isCheckedCh2) {
-            S0 = (int) Math.ceil(-0.0009 * G * G + 1.1917 * G - 4.0146);
-            S4 = (int) Math.ceil(-0.0011 * G * G + 1.2262 * G + 4.0264);
-        }
-        if (isCheckedCh1 && isCheckedCh3) {
-            S0 = (int) Math.ceil(-0.0009 * G * G + 1.1917 * G - 4.0146);
-            S4 = (int) Math.ceil(-0.0013 * G * G + 1.2608 * G + 12.067);
-        }
-        if (isCheckedCh1 && isCheckedCh4) {
-            S0 = (int) Math.ceil(-0.0009 * G * G + 1.1917 * G - 4.0146);
-            S4 = (int) Math.ceil(-0.0026 * G * G + 1.5713 * G + 14.8);
-        }
-        if (isCheckedCh2 && isCheckedCh3) {
-            S0 = (int) Math.ceil(-0.0011 * G * G + 1.2262 * G + 4.0264);
-            S4 = (int) Math.ceil(-0.0013 * G * G + 1.2608 * G + 12.067);
-        }
-        if (isCheckedCh2 && isCheckedCh4) {
-            S0 = (int) Math.ceil(-0.0011 * G * G + 1.2262 * G + 4.0264);
-            S4 = (int) Math.ceil(-0.0026 * G * G + 1.5713 * G + 14.8);
 
-        }
-        int mid = (R + B) / 2;
-        if (!isCheckedCh0) {
-            if (S0 <= mid && mid <= S4) {
-                return true;
-            } else
-                return false;
-        } else {
-            if (S0 <= mid && mid <= S4) {
-                return false;
-            } else
-                return true;
-        }
-
-    }
      public  boolean isFaceLayer(int R,int B,int G)
      {
          boolean isFace=false;
          if(selectedFilters==null)
          {
-             selectedFilters=new ArrayList<>();
-             selectedFilters.add(second);
+             selectedFilters=new HashMap<>();
+             selectedFilters.put(second,filterList[0]);
          }
-         for(int i=0;i<selectedFilters.size();i++)
+         /*for(int i=0;i<selectedFilters.size();i++)
          {
+
              if(isFaceLayerByFilter(R,B,G,selectedFilters.get(i))) {
                       return true;
                   }
+         }*/
+         Set<String> selectedBoxes=selectedFilters.keySet();
+         Iterator<String> iterator=selectedBoxes.iterator();
+         while (iterator.hasNext())
+         {
+             if(selectedFilters.get(iterator.next()).isFaceLayerByFilter(R,B,G))
+             {
+                 return true;
+             }
          }
          return isFace;
      }
-     private boolean isFaceLayerByFilter(int R,int B,int G,String filter)
-     {
-            double filters[]=calcPoint(G,filter);
-            double S_1=filters[0];
-            double S_2=filters[1];
-           if(R>G &&R>B &&(R+G+B)/3<180 &&S_1<=(R+B)/2 && (R+B)/2 <=S_2) {
-             return true;
-         }
-         return false;
-     }
-    private double[] calcPoint(int G,String filter) {
-
-        double value1=0;
-        double value2=0;
-        switch (filter)
-        {
-            case second:
-                value1 =(0.9848 * G -6.7474);
-                value2=-0.0009*G*G+1.1917*G+4.0146;
-                break;
-            case third:
-                value1=-0.0009*G*G+1.1917*G+4.0146;
-                value2=-0.0011*G*G+1.2262*G+4.0264;
-                break;
-            case forth:
-                value1=-0.0011*G*G+1.2262*G+4.0264;
-                value2=-0.0013*G*G+1.2608*G+12.067;
-                break;
-            case five:
-                value1 =(0.9848 * G -6.7474);
-                value2=-0.0009*G*G+1.1917*G+4.0146;
-                break;
-            default:
-                value1 =(0.9848 * G -6.7474);
-                value2=-0.0009*G*G+1.2262*G+4.0264;
-                break;
-        }
-        return new double[]{value1,value2};
-    }
-
+   
     private void createAndShowGUI()
     {
 
