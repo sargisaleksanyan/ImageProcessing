@@ -37,6 +37,7 @@ public class Window extends JFrame implements ActionListener {
     private ImageTool imageTools;
     private Point imagePoint;
     private ImageData image_Data;
+    private boolean isFiltered=false;
     public Window()
     {
         initializeWindow();
@@ -47,20 +48,21 @@ public class Window extends JFrame implements ActionListener {
     }
 
     public void drawFrame() {
+   if(isFiltered) {
+    ImageGeometry geo = new ImageGeometry(myImage, this);
+    ImageData imageData = geo.getImageDate(imageSourceName);
+    image_Data = imageData;
+    Graphics2D graph = currentImage.createGraphics();
+    graph.setColor(Color.RED);
+    graph.drawRect(imageData.MeanX - imageData.deviationX,
+            imageData.MeanY - imageData.deviationY,
+            imageData.deviationX * 2, imageData.deviationY * 2);
+    imageLabel.setIcon(null);
+    imageLabel.setIcon(new ImageIcon(currentImage));
 
-        ImageGeometry geo = new ImageGeometry(myImage,this);
-        ImageData imageData=geo.getImageDate(imageSourceName);
-        image_Data=imageData;
-        Graphics2D graph=currentImage.createGraphics();
-        graph.setColor(Color.RED);
-        graph.drawRect(imageData.MeanX - imageData.deviationX ,
-                       imageData.MeanY - imageData.deviationY ,
-                       imageData.deviationX * 2, imageData.deviationY * 2);
-        imageLabel.setIcon(null);
-        imageLabel.setIcon(new ImageIcon(currentImage));
-
-        graph.dispose();
-        invalidate();
+    graph.dispose();
+    invalidate();
+       }
     }
 
     public void initializeWindow() {
@@ -147,6 +149,7 @@ public class Window extends JFrame implements ActionListener {
     public  void resetImage()
     {
         imageLabel.setIcon(null);
+        isFiltered=false;
         imageLabel.setIcon(new ImageIcon(myImage));
         currentImage=myImage;
         filterFrame.setSelectedFilters(null);
@@ -217,8 +220,10 @@ public class Window extends JFrame implements ActionListener {
        int h = myImage.getHeight();
        BufferedImage buf=new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
        Graphics2D graph=buf.createGraphics();
+        isFiltered=true;
        for (int i = 0; i < h; i++) {
            for (int j = 0; j < w; j++) {
+
                Color c = new Color(myImage.getRGB(j, i));
                int R = c.getRed();
                int G = c.getGreen();
