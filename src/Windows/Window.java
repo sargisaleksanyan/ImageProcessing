@@ -3,6 +3,7 @@ package Windows;
 import ImageGeometry.ImageData;
 import ImageGeometry.ImageGeometry;
 import Tools.FilterTool;
+import Tools.ImageTool;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -17,18 +18,11 @@ import java.io.*;
  * Created by sargis on 4/28/17.
  */
 public class Window extends JFrame implements ActionListener {
-
     private Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     private double width = screenSize.getWidth();
     private double height = screenSize.getHeight();
     private JButton imageUpload;
     private JButton save;
-    private JButton zoomIn ;
-    private JButton zoomOut;
-    private JButton frameDrawer;
-    private JButton filter;
-    private JButton filter_byframe;
-    private JButton saveFrame;
     private JLabel  imageLabel;
     private JPanel  buttonPanel;
     private ImageIcon image;
@@ -40,15 +34,12 @@ public class Window extends JFrame implements ActionListener {
     private final double widthScale=0.7;
     private final double heightScale=0.8;
     private FilterTool filterFrame;
-    private boolean isClicked = false;
-    private JButton reset;
-    private Graphics myg = null;
+    private ImageTool imageTools;
     private Point imagePoint;
     private ImageData image_Data;
     public Window()
     {
-
-      initializeWindow();
+        initializeWindow();
     }
     public FilterTool getFilterTool()
     {
@@ -67,6 +58,7 @@ public class Window extends JFrame implements ActionListener {
                        imageData.deviationX * 2, imageData.deviationY * 2);
         imageLabel.setIcon(null);
         imageLabel.setIcon(new ImageIcon(currentImage));
+
         graph.dispose();
         invalidate();
     }
@@ -84,12 +76,12 @@ public class Window extends JFrame implements ActionListener {
         int w= (int) (width*widthScale);
         int h= (int) (height*heightScale);
         save.addActionListener(this);
+        imageTools=new ImageTool(200);
         imageUpload.addActionListener(this);
         buttonPanel=new JPanel();
-        buttonPanel.setPreferredSize(new Dimension(iniButtonWidth,50));
-        buttonPanel.setLayout(new GridLayout(2,1));
+        buttonPanel.setPreferredSize(new Dimension(iniButtonWidth,30));
+        buttonPanel.setLayout(new GridLayout(1,1));
         buttonPanel.add(imageUpload);
-        buttonPanel.add(save);
         add(buttonPanel);
         setSize(w,h);
         setVisible(true);
@@ -97,32 +89,16 @@ public class Window extends JFrame implements ActionListener {
 
     public void initButtonsForImage()
     {
-       if(zoomOut!=null&&zoomIn !=null) {
-            buttonPanel.removeAll();
+        if(imageTools.getFilter()!=null)
+        {
+            imageTools.removeComponents();
+            imageTools.reInitButtons();
         }
-            zoomIn=new JButton("ZoomIn");
-            zoomOut = new JButton("ZoomOut");
-            frameDrawer=new JButton("Frame");
-            filter = new JButton("Filter");
-            filter_byframe=new JButton("Filter_Frame");
-            saveFrame=new JButton("Save_Frame");
-            zoomOut.setPreferredSize(new Dimension(zoomButtonWidth, 25));
-            zoomIn.setPreferredSize(new Dimension(zoomButtonWidth, 25));
-            zoomIn.addActionListener(this);
-            zoomOut.addActionListener(this);
-            frameDrawer.addActionListener(this);
-            filter_byframe.addActionListener(this);
-            saveFrame.addActionListener(this);
-            filter.addActionListener(this);
-            int wid= (int) (zoomButtonWidth*1.2);
-            buttonPanel.setPreferredSize(new Dimension((int)(wid), 200));
-            buttonPanel.setLayout(new GridLayout(8, 1));
-            buttonPanel.add(zoomIn);
-            buttonPanel.add(zoomOut);
-            buttonPanel.add(frameDrawer);
-            buttonPanel.add(filter);
-            buttonPanel.add(filter_byframe);
-            buttonPanel.add(saveFrame);
+        imageTools.add(imageUpload);
+        remove(buttonPanel);
+        imageTools.setActionListener(this);
+        add(imageTools);
+        invalidate();
     }
     public void setFilterTool(BufferedImage bufferedImage)
     {
@@ -130,7 +106,7 @@ public class Window extends JFrame implements ActionListener {
         {
             remove(filterFrame);
         }
-        reset= new JButton("Reset");
+        JButton reset= new JButton("Reset");
         reset.setPreferredSize(new Dimension(200,20));
         filterFrame=new FilterTool(bufferedImage);
         add(filterFrame);
@@ -212,8 +188,6 @@ public class Window extends JFrame implements ActionListener {
     public void filterFrameImage(ImageData iD)  {
         int w = myImage.getWidth();
         int h = myImage.getHeight();
-
-      //  BufferedImage buf=new BufferedImage(w,h,BufferedImage.TYPE_INT_RGB);
         Graphics2D graph=myImage.createGraphics();
         for (int i = iD.MeanY-iD.deviationY; i < iD.MeanY+iD.deviationY; i++) {
             for (int j = iD.MeanX-iD.deviationX; j <iD.MeanX+iD.deviationX; j++) {
@@ -238,7 +212,6 @@ public class Window extends JFrame implements ActionListener {
         image=new ImageIcon(myImage);
         invalidate();
     }
-
     public void filterImage()  {
        int w = myImage.getWidth();
        int h = myImage.getHeight();
@@ -335,13 +308,13 @@ public class Window extends JFrame implements ActionListener {
         if(actionEvent.getSource()==imageUpload) {
             uploadImage();
         }
-       else  if (actionEvent.getSource() == filter) {
+       else  if (actionEvent.getSource() == imageTools.getFilter()) {
             filterImage();
         }
-        else if(actionEvent.getSource()==zoomIn) {
+        else if(actionEvent.getSource()==imageTools.getZoomIn()) {
             zoomIn();
         }
-        else if(actionEvent.getSource()==zoomOut) {
+        else if(actionEvent.getSource()==imageTools.getZoomOut()) {
             zoomOut();
         }
         else if(actionEvent.getSource()==save)
@@ -349,7 +322,7 @@ public class Window extends JFrame implements ActionListener {
             String pictureName = JOptionPane.showInputDialog("Name of New picture and format png/gif/bmp");
             save(pictureName);
         }
-        else if(actionEvent.getSource()==frameDrawer)
+        else if(actionEvent.getSource()==imageTools.getFrameDrawer())
         {
             drawFrame();
         }
@@ -358,15 +331,15 @@ public class Window extends JFrame implements ActionListener {
             filterFrame.unSelectCheckBox();
             resetImage();
         }
-        else if(actionEvent.getSource()==saveFrame)
+        else if(actionEvent.getSource()==imageTools.getSaveFrame())
         {
             saveImageFrame();
         }
-        else if(actionEvent.getSource()==filter_byframe)
+        else if(actionEvent.getSource()==imageTools.getFilter_byframe())
         {
             ImageData id= getImage_Data();
             filterFrameImage(id);
-         
+
         }
 
     }
