@@ -50,13 +50,7 @@ public class Filter {
         }
         return imagePixeles;
     }
-    public BufferedImage getBufferedImage() {
-        return bufferedImage;
-    }
 
-    public void setBufferedImage(BufferedImage bufferedImage) {
-        this.bufferedImage = bufferedImage;
-    }
 
     private double[] bounds(int G) {
         double value1=0;

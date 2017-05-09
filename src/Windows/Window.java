@@ -14,15 +14,12 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 
-/**
- * Created by sargis on 4/28/17.
- */
+
 public class Window extends JFrame implements ActionListener {
     private Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     private double width = screenSize.getWidth();
     private double height = screenSize.getHeight();
     private JButton imageUpload;
-    private JButton save;
     private JLabel  imageLabel;
     private JPanel  buttonPanel;
     private ImageIcon image;
@@ -48,36 +45,51 @@ public class Window extends JFrame implements ActionListener {
     }
 
     public void drawFrame() {
-   if(isFiltered) {
-    ImageGeometry geo = new ImageGeometry(myImage, this);
-    ImageData imageData = geo.getImageDate(imageSourceName);
-    image_Data = imageData;
-    Graphics2D graph = currentImage.createGraphics();
-    graph.setColor(Color.RED);
-    graph.drawRect(imageData.MeanX - imageData.deviationX,
+     if(isFiltered) {
+     ImageGeometry geo = new ImageGeometry(myImage, this);
+     ImageData imageData = geo.getImageDate(imageSourceName);
+     image_Data = imageData;
+     Graphics2D graph = currentImage.createGraphics();
+     graph.setColor(Color.RED);
+     graph.drawRect(imageData.MeanX - imageData.deviationX,
             imageData.MeanY - imageData.deviationY,
             imageData.deviationX * 2, imageData.deviationY * 2);
-    imageLabel.setIcon(null);
-    imageLabel.setIcon(new ImageIcon(currentImage));
+     imageLabel.setIcon(null);
+     imageLabel.setIcon(new ImageIcon(currentImage));
 
     graph.dispose();
     invalidate();
        }
     }
 
+    public void drawAxis()
+    {
+        if(isFiltered) {
+            ImageGeometry geo = new ImageGeometry(myImage, this);
+            ImageData imageData = geo.getImageDate(imageSourceName);
+            image_Data = imageData;
+            Graphics2D graph = currentImage.createGraphics();
+            graph.setColor(Color.RED);
+            graph.drawRect(imageData.MeanX,
+                  0,
+                    1, currentImage.getHeight());
+            imageLabel.setIcon(null);
+            imageLabel.setIcon(new ImageIcon(currentImage));
+
+            graph.dispose();
+            invalidate();
+        }
+    }
     public void initializeWindow() {
         setVisible(true);
         setLayout(new FlowLayout());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         imageLabel=new JLabel();
         add(imageLabel);
-        save= new JButton("Save");
         imageUpload=new JButton("Upload");
-        save.setPreferredSize(new Dimension(iniButtonWidth,25));
         imageUpload.setPreferredSize(new Dimension(iniButtonWidth,25));
         int w= (int) (width*widthScale);
         int h= (int) (height*heightScale);
-        save.addActionListener(this);
         imageTools=new ImageTool(200);
         imageUpload.addActionListener(this);
         buttonPanel=new JPanel();
@@ -91,7 +103,7 @@ public class Window extends JFrame implements ActionListener {
 
     public void initButtonsForImage()
     {
-        if(imageTools.getFilter()!=null)
+        if(imageTools.getSaveFrame()!=null)
         {
             imageTools.removeComponents();
             imageTools.reInitButtons();
@@ -108,11 +120,13 @@ public class Window extends JFrame implements ActionListener {
         {
             remove(filterFrame);
         }
-        JButton reset= new JButton("Reset");
-        reset.setPreferredSize(new Dimension(200,20));
+        //JButton reset= new JButton("Reset");
+        //reset.setPreferredSize(new Dimension(200,20));
         filterFrame=new FilterTool(bufferedImage);
         add(filterFrame);
         filterFrame.getResetFilter().addActionListener(this);
+        filterFrame.getFilter().addActionListener(this);
+        filterFrame.getFilter_byframe().addActionListener(this);
         invalidate();
     }
     private void uploadImage() {
@@ -126,9 +140,13 @@ public class Window extends JFrame implements ActionListener {
             imageSourceName = chooser.getSelectedFile().toString();
             imageLabel.setIcon(image);
             initButtonsForImage();
-
             imagePoint=imageLabel.getLocation();
             myImage = readImage(imageSourceName);
+            if(filterFrame!=null)
+            {
+                filterFrame.removeAll();
+                filterFrame=null;
+            }
             setFilterTool(myImage);
             invalidate();
         } else {
@@ -150,8 +168,10 @@ public class Window extends JFrame implements ActionListener {
     {
         imageLabel.setIcon(null);
         isFiltered=false;
-        imageLabel.setIcon(new ImageIcon(myImage));
+        ImageIcon newImage=new ImageIcon(myImage);
+        imageLabel.setIcon(newImage);
         currentImage=myImage;
+        image=newImage;
         filterFrame.setSelectedFilters(null);
         invalidate();
     }
@@ -313,7 +333,7 @@ public class Window extends JFrame implements ActionListener {
         if(actionEvent.getSource()==imageUpload) {
             uploadImage();
         }
-       else  if (actionEvent.getSource() == imageTools.getFilter()) {
+       else  if (actionEvent.getSource() == filterFrame.getFilter()) {
             filterImage();
         }
         else if(actionEvent.getSource()==imageTools.getZoomIn()) {
@@ -322,14 +342,15 @@ public class Window extends JFrame implements ActionListener {
         else if(actionEvent.getSource()==imageTools.getZoomOut()) {
             zoomOut();
         }
-        else if(actionEvent.getSource()==save)
+        else if(actionEvent.getSource()==imageTools.getSave())
         {
             String pictureName = JOptionPane.showInputDialog("Name of New picture and format png/gif/bmp");
             save(pictureName);
         }
         else if(actionEvent.getSource()==imageTools.getFrameDrawer())
         {
-            drawFrame();
+           drawFrame();
+
         }
         else if(actionEvent.getSource()==filterFrame.getResetFilter())
         {
@@ -340,12 +361,15 @@ public class Window extends JFrame implements ActionListener {
         {
             saveImageFrame();
         }
-        else if(actionEvent.getSource()==imageTools.getFilter_byframe())
+        else if(actionEvent.getSource()==filterFrame.getFilter_byframe())
         {
             ImageData id= getImage_Data();
             filterFrameImage(id);
 
         }
-
+        else if(actionEvent.getSource()==imageTools.getAxis())
+        {
+            drawAxis();
+        }
     }
 }

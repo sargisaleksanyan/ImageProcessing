@@ -1,12 +1,12 @@
 package Tools;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -18,7 +18,8 @@ public class FilterTool extends JPanel {
     private JCheckBox ch2 = new JCheckBox(" - Filter 2");
     private JCheckBox ch3 = new JCheckBox(" - Filter 3");
     private JCheckBox ch4 = new JCheckBox(" - Filter 4");
-    private List<HashMap<int[],Boolean>> filters;
+    private JButton filter;
+    private JButton filter_byframe;
     private JButton resetFilter;
     public HashMap<String,Filter> getSelectedFilters() {
         return selectedFilters;
@@ -127,13 +128,6 @@ public class FilterTool extends JPanel {
              selectedFilters=new HashMap<>();
              selectedFilters.put(second,filterList[0]);
          }
-         /*for(int i=0;i<selectedFilters.size();i++)
-         {
-
-             if(isFaceLayerByFilter(R,B,G,selectedFilters.get(i))) {
-                      return true;
-                  }
-         }*/
          Set<String> selectedBoxes=selectedFilters.keySet();
          Iterator<String> iterator=selectedBoxes.iterator();
          while (iterator.hasNext())
@@ -145,23 +139,37 @@ public class FilterTool extends JPanel {
          }
          return isFace;
      }
-   
+    public  JButton getFilter() {
+        return filter;
+    }
+    public  JButton getFilter_byframe() {
+        return filter_byframe;
+    }
     private void createAndShowGUI()
     {
 
         t1=new JToolBar(JToolBar.VERTICAL);
         resetFilter = new JButton("Reset Filter");
-       // t1.add(ch0);
+        filter = new JButton("Filter");
+        filter_byframe=new JButton("Filter_Frame");
+        JPanel buttonPanel=new JPanel();
         t1.add(ch1);
         t1.add(ch2);
         t1.add(ch3);
         t1.add(ch4);
-        t1.add(resetFilter);
         t1.setRollover(false);
         t1.setFloatable(false);
+        buttonPanel.add(resetFilter);
+        buttonPanel.add(filter);
+        buttonPanel.add(filter_byframe);
+        buttonPanel.setLayout(new GridLayout(4,1));
         add(t1);
-        setSize(200,400);
-        setLocation(100, 400);
+        add(buttonPanel);
+
+        setLayout(new GridLayout(2,1));
+
+      //  setSize(200,450);
+     //   setLocation(100, 400);
         setVisible(true);
     }
 

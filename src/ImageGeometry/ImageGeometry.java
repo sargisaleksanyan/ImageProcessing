@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by sargis on 4/28/17.
  */
-public class ImageGeometry {
+public class ImageGeometry  {
     private List<Integer> valX;
     private List<Integer> valY;
     private  BufferedImage image;
